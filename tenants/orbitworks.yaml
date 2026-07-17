@@ -1,0 +1,20 @@
+# Small Azure single-tenant environment consolidating into the shared platform.
+tenant:
+  id: orbitworks
+  name: OrbitWorks Manufacturing
+  tier: standard
+  owner_email: platform-team@example.com
+source:
+  platform: azure
+  os: linux
+  region: eastus2
+target:
+  cloud: azure
+  environment: prod
+  region: eastus
+database:
+  engine: mysql
+  size_gb: 12
+  downtime_budget_minutes: 240
+cutover:
+  window: anytime

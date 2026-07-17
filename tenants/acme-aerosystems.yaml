@@ -1,0 +1,21 @@
+# Highest-friction shape: customer-hosted Windows box under someone else's desk.
+tenant:
+  id: acme-aerosystems
+  name: Acme Aerosystems
+  tier: premium
+  owner_email: platform-team@example.com
+source:
+  platform: onprem
+  os: windows
+  notes: Customer-hosted VM, SQL Server 2016, nightly full backups only.
+target:
+  cloud: azure
+  environment: prod
+  region: eastus
+database:
+  engine: sqlserver
+  size_gb: 180
+  downtime_budget_minutes: 30
+cutover:
+  window: weekend
+  compliance: [itar, cui]
