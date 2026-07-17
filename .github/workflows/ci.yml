@@ -1,0 +1,49 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  orchestrator:
+    name: orchestrator tests and tenant validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r orchestrator/requirements.txt
+
+      - name: Run test suite
+        run: PYTHONPATH=orchestrator python -m pytest tests -q
+
+      - name: Validate tenant definitions
+        run: PYTHONPATH=orchestrator python -m migrate_factory.cli validate
+
+      - name: Print wave plan
+        run: PYTHONPATH=orchestrator python -m migrate_factory.cli plan-waves
+
+  terraform:
+    name: terraform validate (${{ matrix.stack }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        stack: [aws, azure]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.9.8"
+
+      - name: Init without backend
+        run: terraform -chdir=terraform/${{ matrix.stack }} init -backend=false -input=false
+
+      - name: Validate
+        run: terraform -chdir=terraform/${{ matrix.stack }} validate -no-color
